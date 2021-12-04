@@ -1,7 +1,7 @@
 #pragma once
 // Includes go here
 #include <vector>
-using namspace std;
+using namespace std;
 
 class Graph {
     public:

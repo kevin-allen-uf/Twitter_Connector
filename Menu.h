@@ -1,6 +1,6 @@
 #pragma once
 // Includes go here
-using namspace std;
+using namespace std;
 
 class Menu {
     public:

@@ -2,7 +2,6 @@
 #include <fstream>
 #include <string>
 #include <iostream>
-using namespace std;
 
 Graph::Graph() {
     vertices = 11316811;
@@ -35,5 +34,5 @@ void Graph::BFS() {
 }
 
 void Graph::MST() {
-    
+
 }
