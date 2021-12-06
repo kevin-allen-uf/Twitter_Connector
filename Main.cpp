@@ -1,6 +1,6 @@
+// Other includes go here
 #include "Graph.h"
 #include "Menu.h"
-// Other includes go here
 using namespace std;
 
 int main () {
