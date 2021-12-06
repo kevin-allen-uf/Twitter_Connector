@@ -35,7 +35,7 @@ vector<vector<int>> Graph::MST(int id) {
     vector<int> follower = FollowerTree(id);
     connections.push_back(follower);
 
-    return connections;
+    return connections; // Outer vector size 2, connections[0] is following level counts and connections[1] is follower level counts
 }
 
 vector<int> Graph::GetIDSCC(int id) {
