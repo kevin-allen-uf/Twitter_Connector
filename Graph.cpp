@@ -24,7 +24,7 @@ void Graph::BFS(int id1, int id2) {
 }
 
 // Find one user's entire spanning tree inward and outward by level
-vector<vector<int>> Graph::MST(int id) {
+vector<vector<int>> Graph::GetConnections(int id) {
     vector<vector<int>> connections;
 
     // Get following connection tree
