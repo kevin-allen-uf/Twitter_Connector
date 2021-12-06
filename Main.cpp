@@ -5,12 +5,14 @@ using namespace std;
 
 int main () {
     /* PLAN
-       1. Load in graph dataset
+       1. Load in graph dataset, generate SCC's using algorithm
        2. Load menu prompt, continue to 3 if exit not selected
        3. Get user input
        4. Perform BST or Modified Spanning Tree algorithm
        5. Output valuable results for given algorithm
        6. Go back to step 2 
+
+       OPTIONAL: Include timer information for algorithms in CLI
     */
 
    // Step 1
