@@ -7,8 +7,9 @@ class Graph {
     public:
         Graph();
         void LoadData();
-        void BFS(); // Breadth First Search, can modify parameters/return and copy/paste code in
-        void MST(); // Modified Spanning Tree, can modify parameters/return and copy/paste code in
+        void BFS(int id1, int id2); // Breadth First Search, can modify parameters/return and copy/paste code in
+        void MST(int id);
+        void MST(int id1, int id2); // Modified Spanning Tree, can modify parameters/return and copy/paste code in
 
     private:
         // Private variables and functions

@@ -29,10 +29,14 @@ void Graph::LoadData() {
     }
 }
 
-void Graph::BFS() {
+void Graph::BFS(int id1, int id2) {
 
 }
 
-void Graph::MST() {
+void Graph::MST(int id) {
+    // Find one user's entire spanning tree inward and outward by level
+}
 
+void Graph::MST(int id1, int id2) {
+    // Find connections in Spanning Trees in common by level of following/followed?
 }
