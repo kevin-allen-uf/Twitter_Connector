@@ -14,13 +14,55 @@ Graph::Graph() {
     edges = 85331846;
     adjList.resize(vertices);
 
+    cout << "Loading Twitter data..." << endl;
     LoadData();
 
-    SCC();
+    cout << "Performing Strongly Connnected Components Algorithm..." << endl << endl;
+    //SCC(); FIX, causing crashes
 }
 
-void Graph::BFS(int id1, int id2) {
-    // TODO for Dennis
+int Graph::BFS(int id1, int id2) {
+    int levels = 0;
+    queue<int> toCheck;
+    vector<bool> visited;
+
+    int lastInLevel = id1; // Use lastInLevel and last to correctly update level counts
+    int last = id1;
+
+    for (int i = 0; i < adjList.size(); i++)  {
+        visited.push_back(false);
+    }
+
+    visited[id1] = true;
+    toCheck.push(id1);
+
+    while (!toCheck.empty()) {
+        int checking = toCheck.front();
+        toCheck.pop();
+
+
+        if (visited[id2]) {
+            return levels;
+        }
+
+        vector<int> neighbors = adjList[checking];
+
+        for (int i = 0; i < neighbors.size(); i++) {
+            
+            if (!visited[neighbors[i]]) {
+                visited[neighbors[i]] = true;
+                toCheck.push(neighbors[i]);
+                last = neighbors[i];
+            }
+        }
+
+        if (lastInLevel == checking) {
+            levels++;
+            lastInLevel = last;
+        }
+
+    }
+    return levels;
 }
 
 // Find one user's entire spanning tree inward and outward by level
@@ -80,7 +122,7 @@ void Graph::SCC() {
     vector<vector<int>> reverseAdjList; // Make reverse (transposed) version of adjacency list graph
     reverseAdjList.resize(vertices);
     for (int i = 0; i < vertices; i++) {
-        for (auto j = 0; j < adjList[i].size(); j++) {
+        for (int j = 0; j < adjList[i].size(); j++) {
             reverseAdjList[j].push_back(i);
         }
         visited[i] = false; // Set back to false before second DFS
@@ -127,8 +169,9 @@ vector<int> Graph::FollowingTree(int id) {
 
     int total = 0;
     int lastInLevel = id; // Use lastInLevel and last to correctly update level counts
-    int last = -1;
+    int last = id;
     int lastTotal = 0; // Difference between total and this variables holds level count
+    int levels = 0;
 
     queue<int> toCheck;
     set<int> checked; // Make sure no values checked multiple times
@@ -148,11 +191,20 @@ vector<int> Graph::FollowingTree(int id) {
                 last = adjList[checking][i];
             }
         }
+
+        if (total - lastTotal == 0) {
+            break;
+        }
         
         if (lastInLevel == checking) { // Push level count to vector and move to counting next vector
             lastInLevel = last;
             following.push_back(total - lastTotal);
             lastTotal = total;
+            levels++;
+        }
+
+        if (levels == 2) {
+            break;
         }
     }
 
@@ -166,8 +218,9 @@ vector<int> Graph::FollowerTree(int id) {
 
     int total = 0;
     int lastInLevel = id;
-    int last = -1;
+    int last = id;
     int lastTotal = 0;
+    int levels = 0;
 
     queue<int> toCheck;
     set<int> checked;
@@ -190,12 +243,21 @@ vector<int> Graph::FollowerTree(int id) {
                 }
             }
         }
+
+        if (total - lastTotal == 0) {
+            break;
+        }
         
         if (lastInLevel == checking) {
             lastInLevel = last;
             follower.push_back(total - lastTotal);
             lastTotal = total;
-        }    
+            levels++;
+        }
+
+        if (levels == 2) {
+            break;
+        }
     }
 
     follower[0] = total;

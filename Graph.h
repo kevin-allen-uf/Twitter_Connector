@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 // Includes go here
 #include <vector>
 #include <stack>
@@ -8,7 +8,7 @@ class Graph {
     public:
         // Public functions
         Graph();
-        void BFS(int id1, int id2); // Breadth First Search, can modify parameters/return and copy/paste code in
+        int BFS(int id1, int id2); // Breadth First Search, can modify parameters/return and copy/paste code in
         vector<vector<int>> GetConnections(int id); // Spanning Tree, additional non-graph specific algorithm
         vector<int> GetIDSCC(int id); // Get ID's SCC so menu/main class can print
 
