@@ -92,14 +92,18 @@ int main () {
 
             vector<int> strongConnections = twitterData.GetIDSCC(id);
             cout << "Total strong connections: " << strongConnections.size() - 1 << endl;
-            cout << "Strong connection users with user " << id << ":";
-            for (int i = 0; i < strongConnections.size(); i++) {
-                cout << " " << strongConnections[i];
+            if (strongConnections.size() - 1 > 0) {
+                cout << "Strong connection users with user " << id << ":";
+                for (int i = 0; i < strongConnections.size(); i++) {
+                    if (strongConnections[i] != id) {
+                        cout << " " << strongConnections[i];
+                    } 
+                }
+                cout << endl;
             }
-            cout << endl;
         }
         else if (option == 4) { // Exit
-            cout << "Thank you for using the Twitter Simulator!" << endl;
+            cout << "Thank you for using the Twitter Connector!" << endl;
             break;
         }
         else {

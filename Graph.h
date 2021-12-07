@@ -23,8 +23,8 @@ class Graph {
         // Private helper functions
         void LoadData();
         void SCC(); // Algorithm that does Strongly Connected Components, learned about concepts through GeeksforGeeks
-        void GetComponent(int vertex, vector<vector<int>>& reverseAdjList, vector<bool>& visited, vector<int>& strongComponent); // Helper for SCC
-        void VisitVertex(int vertext, vector<bool>& visited, stack<int>& toProcess); // Helper for SCC
+        // void GetComponent(int vertex, vector<vector<int>>& reverseAdjList, vector<bool>& visited, vector<int>& strongComponent); // Helper for SCC
+        // void VisitVertex(int vertext, vector<bool>& visited, stack<int>& toProcess); // Helper for SCC
         vector<int> FollowingTree(int id);
         vector<int> FollowerTree(int id);
 };
