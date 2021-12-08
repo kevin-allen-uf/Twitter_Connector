@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <map>
 #include <set>
 #include <queue>
 #include <algorithm>
@@ -23,48 +24,34 @@ Graph::Graph() {
     cout <<" done!" << endl << endl;
 }
 
-int Graph::BFS(int id1, int id2) {
-    int levels = 0;
+bool Graph::BFS(int id1, int id2, int &levels) {
     queue<int> toCheck;
-    vector<bool> visited;
+    set<int> visited;
+    map<int, int> vertexLevels;  // used to keep track of each level the vertices are on (key = id, value = level)
 
-    int lastInLevel = id1; // Use lastInLevel and last to correctly update level counts
-    int last = id1;
-
-    for (int i = 0; i < adjList.size(); i++)  {
-        visited.push_back(false);
-    }
-
-    visited[id1] = true;
+    visited.insert(id1);
     toCheck.push(id1);
+    vertexLevels[id1] = levels;
 
     while (!toCheck.empty()) {
+        
         int checking = toCheck.front();
         toCheck.pop();
 
-
-        if (visited[id2]) {
-            return levels;
+        if (visited.find(id2) != visited.end()) {
+            levels = vertexLevels[id2] - 1; // subtracting 1 to determine # of levels between each id instead of the level id2 is on
+            return true;
         }
+        for (int i = 0; i < adjList[checking].size(); i++) {
 
-        vector<int> neighbors = adjList[checking];
-
-        for (int i = 0; i < neighbors.size(); i++) {
-            
-            if (!visited[neighbors[i]]) {
-                visited[neighbors[i]] = true;
-                toCheck.push(neighbors[i]);
-                last = neighbors[i];
+            if (visited.find(adjList[checking][i]) == visited.end()) {
+                toCheck.push(adjList[checking][i]);
+                visited.insert(adjList[checking][i]);
+                vertexLevels[adjList[checking][i]] = vertexLevels[checking] + 1;    // inserting new vertex with +1 level value of current vertex
             }
         }
-
-        if (lastInLevel == checking) {
-            levels++;
-            lastInLevel = last;
-        }
-
     }
-    return levels;
+    return false;
 }
 
 // Find one user's entire spanning tree inward and outward by level
@@ -129,10 +116,11 @@ void Graph::SCC() {
                 }
                 callStack.pop();
                 toProcess.push(topCall);
-            } */ // FIX: crashes
+            }  // FIX: crashes
             // VisitVertex(i, visited, toProcess);
         }
     }
+    */
 
     vector<vector<int>> reverseAdjList; // Make reverse (transposed) version of adjacency list graph
     reverseAdjList.resize(vertices);

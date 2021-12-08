@@ -45,15 +45,19 @@ int main () {
             int id2;
             cin >> id2;
             
-            int levels = twitterData.BFS(id1, id2);
-            if (levels > 1) {
-                cout << "There are " << levels << " levels of connection between user " << id1 << " and user " << id2 << endl;
-            }
-            else if (levels > 0) {
-                cout << "There is " << levels << " level of connection between user " << id1 << " and user " << id2 << endl;
+            int levels = 0;
+
+            if (!twitterData.BFS(id1, id2, levels)) {
+                cout << "There is no connection between user " << id1 << " and user " << id2 << endl;
             }
             else {
-                cout << "There is no connection between user " << id1 << " and user " << id2 << endl;
+
+                if (levels > 1) {
+                    cout << "There are " << levels << " levels of connection between user " << id1 << " and user " << id2 << endl;
+                }
+                 else if (levels > 0) {
+                    cout << "There is " << levels << " level of connection between user " << id1 << " and user " << id2 << endl;
+                }
             }
         }
         else if (option == 2) { // Find user’s connected network

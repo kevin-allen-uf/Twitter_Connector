@@ -8,7 +8,7 @@ class Graph {
     public:
         // Public functions
         Graph();
-        int BFS(int id1, int id2); // Breadth First Search, can modify parameters/return and copy/paste code in
+        bool BFS(int id1, int id2, int &levels); // Breadth First Search, can modify parameters/return and copy/paste code in
         vector<vector<int>> GetConnections(int id); // Spanning Tree, additional non-graph specific algorithm
         vector<int> GetIDSCC(int id); // Get ID's SCC so menu/main class can print
 
