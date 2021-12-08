@@ -6,6 +6,7 @@
 #include <set>
 #include <queue>
 #include <algorithm>
+#include <utility>
 #include "Graph.h"
 
 /* -------------------- PUBLIC FUNCTIONS -------------------- */
@@ -13,7 +14,7 @@
 Graph::Graph() {
     vertices = 11316811;
     edges = 85331846;
-    adjList.resize(vertices);
+    adjList.resize(vertices + 1);
 
     cout << "Loading Twitter data...";
     LoadData();
@@ -39,7 +40,7 @@ bool Graph::BFS(int id1, int id2, int &levels) {
         toCheck.pop();
 
         if (visited.find(id2) != visited.end()) {
-            levels = vertexLevels[id2] - 1; // subtracting 1 to determine # of levels between each id instead of the level id2 is on
+            levels = vertexLevels[id2]; // subtracting 1 to determine # of levels between each id instead of the level id2 is on
             return true;
         }
         for (int i = 0; i < adjList[checking].size(); i++) {
@@ -86,6 +87,7 @@ vector<int> Graph::GetIDSCC(int id) {
 void Graph::LoadData() {
     fstream fin;
     string file("./Twitter-dataset/data/edges.csv");
+    
     fin.open(file, ios::in);
     string line;
     string from;
@@ -100,42 +102,75 @@ void Graph::LoadData() {
 
 void Graph::SCC() {
     stack<int> toProcess;
-    vector<bool> visited(vertices, false);
+    vector<bool> visited(vertices + 1, false);
+    vector<bool> addedToStack(vertices + 1, false);
 
-    /* for (int i = 0; i < vertices; i++) { // Put vertexes in order on stack using iterative DFS
+    // NOTE: Change to i = 1 and i <= vertices once done with sanity testing
+    for (int i = 1; i <= vertices; i++) { // Put vertexes in order on stack using iterative DFS
         if (!visited[i]) {
             stack<int> callStack;
             callStack.push(i);
             while (!callStack.empty()) {
                 int topCall = callStack.top();
-                visited[topCall] = true;
+                callStack.pop();
+
+                if (!addedToStack[topCall]) {
+                    addedToStack[topCall] = true;
+                    callStack.push(topCall);
+                }
+                else {
+                    toProcess.push(topCall);
+                    visited[topCall] = true;
+                }
+
                 for (int j = 0; j < adjList[topCall].size(); j++) {
-                    if (!visited[adjList[topCall][j]]) {
+                    if (!addedToStack[adjList[topCall][j]]) {
                         callStack.push(adjList[topCall][j]);
                     }
                 }
-                callStack.pop();
-                toProcess.push(topCall);
-            }  // FIX: crashes
+            }
             // VisitVertex(i, visited, toProcess);
         }
     }
-    */
-
+    
     vector<vector<int>> reverseAdjList; // Make reverse (transposed) version of adjacency list graph
-    reverseAdjList.resize(vertices);
+    reverseAdjList.resize(vertices + 1);
     for (int i = 0; i < vertices; i++) {
         for (int j = 0; j < adjList[i].size(); j++) {
-            reverseAdjList[j].push_back(i);
+            reverseAdjList[adjList[i][j]].push_back(i);
         }
         visited[i] = false; // Set back to false before second DFS
+        addedToStack[i] = false;
     }
     
     while (!toProcess.empty()) { // Check until each vertex checked
         int processing = toProcess.top();
         toProcess.pop();
-
+        
          if (!visited[processing]) { // If vertex not checked yet find new strongly connected component and add to vector of vectors
+            vector<int> strongComponent;
+            stack<int> callStack;
+            callStack.push(processing);
+            while (!callStack.empty()) {
+                int topCall = callStack.top();
+                callStack.pop();
+
+                if (!addedToStack[topCall]) {
+                    addedToStack[topCall] = true;
+                    callStack.push(topCall);
+                    strongComponent.push_back(topCall);
+                }
+                else {
+                    visited[topCall] = true;
+                }
+
+                for (int j = 0; j < adjList[topCall].size(); j++) {
+                    if (!addedToStack[adjList[topCall][j]]) {
+                        callStack.push(adjList[topCall][j]);
+                    }
+                }
+            }
+
             // GetComponent(processing, reverseAdjList, visited, strongComponent);
             scc.push_back(strongComponent);
         }

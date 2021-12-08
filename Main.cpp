@@ -4,16 +4,6 @@
 using namespace std;
 
 int main () {
-    /* PLAN
-       1. Load in graph dataset, generate SCC's using algorithm
-       2. Load menu prompt, continue to 3 if exit not selected
-       3. Get user input
-       4. Perform menu option
-       5. Output results for menu option
-       6. Go back to step 2 
-
-       OPTIONAL: Include timer information for algorithms in CLI
-    */
 
    // Step 1
    Graph twitterData;
@@ -89,7 +79,7 @@ int main () {
                 }
             }
             else {
-                cout << "User " << id << " has no following connections";
+                cout << "User " << id << " has no following connections" << endl;
             }
             
             if (connections[1].size() > 1) {
@@ -100,7 +90,7 @@ int main () {
                 }
             }
             else {
-                cout << "User " << id << " has no follower connections";
+                cout << "User " << id << " has no follower connections" << endl;
             }
 
         }
@@ -110,16 +100,7 @@ int main () {
             cin >> id;
 
             vector<int> strongConnections = twitterData.GetIDSCC(id);
-            cout << "Total strong connections: " << strongConnections.size() - 1 << endl;
-            if (strongConnections.size() - 1 > 0) {
-                cout << "Strong connection users with user " << id << ":";
-                for (int i = 0; i < strongConnections.size(); i++) {
-                    if (strongConnections[i] != id) {
-                        cout << " " << strongConnections[i];
-                    } 
-                }
-                cout << endl;
-            }
+            cout << "Size of Strongly Connected Component containing user " << id << ": " << strongConnections.size() << endl;
         }
         else if (option == 4) { // Exit
             cout << "Thank you for using the Twitter Connector!" << endl;
