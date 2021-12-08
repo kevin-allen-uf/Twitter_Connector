@@ -135,28 +135,14 @@ void Graph::SCC() {
         int processing = toProcess.top();
         toProcess.pop();
 
-        /* if (!visited[processing]) { // If vertex not checked yet find new strongly connected component and add to vector of vectors
-            vector<int> strongComponent;
-            stack<int> callStack;
-            callStack.push(processing);
-            while (!callStack.empty()) {
-                int topCall = callStack.top();
-                visited[topCall] = true;
-                for (int j = 0; j < adjList[topCall].size(); j++) {
-                    if (!visited[adjList[topCall][j]]) {
-                        callStack.push(adjList[topCall][j]);
-                    }
-                }
-                callStack.pop();
-                strongComponent.push_back(topCall);
-            } */ // FIX: crashes
+         if (!visited[processing]) { // If vertex not checked yet find new strongly connected component and add to vector of vectors
             // GetComponent(processing, reverseAdjList, visited, strongComponent);
             scc.push_back(strongComponent);
         }
     }
 }
 
-/*void Graph::GetComponent(int vertex, vector<vector<int>>& reverseAdjList, vector<bool>& visited, vector<int>& strongComponent) {
+/* void Graph::GetComponent(int vertex, vector<vector<int>>& reverseAdjList, vector<bool>& visited, vector<int>& strongComponent) {
     visited[vertex] = true;
     strongComponent.push_back(vertex); // Add to strong component vector
 
@@ -172,7 +158,7 @@ void Graph::SCC() {
 
     for (int i = 0; i < adjList[vertex].size(); i++) {
         if (!visited[adjList[vertex][i]]) {
-            VisitVertex(adjList[vertex][i], visited, toProcess); // DFS visit for each vertex to fill stack in reverse order using recursion
+            VisitVertex(adjList[vertex][i], visited, toProcess); // DFS visit for each vertex to fill stack in timed order
         }
     }
 
