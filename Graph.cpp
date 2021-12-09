@@ -1,3 +1,5 @@
+// Code developed by JDK Co. (John Ridgeway, Dennis Kim, Kevin Allen)
+
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -11,17 +13,17 @@
 
 /* -------------------- PUBLIC FUNCTIONS -------------------- */
 
-Graph::Graph() {
+Graph::Graph() { // Constructor calls functions responsible for loading graph data into adjList vector and finding SCCs and storing them in scc vector
     vertices = 11316811;
     edges = 85331846;
     adjList.resize(vertices + 1);
 
-    cout << "Loading Twitter data...";
+    cout << "Loading Twitter data (11316811 vertices and 85331846 edges)...";
     LoadData();
     cout << " done!" << endl;
 
-    cout << "Performing Strongly Connnected Components Algorithm...";
-    SCC(); // causing crashes
+    cout << "Performing Kosaraju Strongly Connnected Components Algorithm...";
+    SCC();
     cout <<" done!" << endl << endl;
 }
 
@@ -87,7 +89,6 @@ vector<int> Graph::GetIDSCC(int id) {
 void Graph::LoadData() {
     fstream fin;
     string file("./Twitter-dataset/data/edges.csv");
-    
     fin.open(file, ios::in);
     string line;
     string from;
@@ -103,102 +104,94 @@ void Graph::LoadData() {
 void Graph::SCC() {
     stack<int> toProcess;
     vector<bool> visited(vertices + 1, false);
-    vector<bool> addedToStack(vertices + 1, false);
+    vector<int> retIndexes(vertices + 1, 0); // Helps with "recursion"
 
-    // NOTE: Change to i = 1 and i <= vertices once done with sanity testing
     for (int i = 1; i <= vertices; i++) { // Put vertexes in order on stack using iterative DFS
         if (!visited[i]) {
-            stack<int> callStack;
-            callStack.push(i);
-            while (!callStack.empty()) {
-                int topCall = callStack.top();
-                callStack.pop();
-
-                if (!addedToStack[topCall]) {
-                    addedToStack[topCall] = true;
-                    callStack.push(topCall);
-                }
-                else {
-                    toProcess.push(topCall);
-                    visited[topCall] = true;
-                }
-
-                for (int j = 0; j < adjList[topCall].size(); j++) {
-                    if (!addedToStack[adjList[topCall][j]]) {
-                        callStack.push(adjList[topCall][j]);
-                    }
-                }
-            }
-            // VisitVertex(i, visited, toProcess);
+            VisitVertex(i, visited, retIndexes, toProcess);
         }
     }
+
+    cout << " all vertices visited...";
     
     vector<vector<int>> reverseAdjList; // Make reverse (transposed) version of adjacency list graph
     reverseAdjList.resize(vertices + 1);
-    for (int i = 0; i < vertices; i++) {
+    for (int i = 1; i <= vertices; i++) {
         for (int j = 0; j < adjList[i].size(); j++) {
             reverseAdjList[adjList[i][j]].push_back(i);
         }
         visited[i] = false; // Set back to false before second DFS
-        addedToStack[i] = false;
+        retIndexes[i] = 0;
     }
+
+    cout << " transposed graph created...";
     
     while (!toProcess.empty()) { // Check until each vertex checked
         int processing = toProcess.top();
         toProcess.pop();
         
-         if (!visited[processing]) { // If vertex not checked yet find new strongly connected component and add to vector of vectors
-            vector<int> strongComponent;
-            stack<int> callStack;
-            callStack.push(processing);
-            while (!callStack.empty()) {
-                int topCall = callStack.top();
-                callStack.pop();
-
-                if (!addedToStack[topCall]) {
-                    addedToStack[topCall] = true;
-                    callStack.push(topCall);
-                    strongComponent.push_back(topCall);
-                }
-                else {
-                    visited[topCall] = true;
-                }
-
-                for (int j = 0; j < adjList[topCall].size(); j++) {
-                    if (!addedToStack[adjList[topCall][j]]) {
-                        callStack.push(adjList[topCall][j]);
-                    }
-                }
-            }
-
-            // GetComponent(processing, reverseAdjList, visited, strongComponent);
+        if (!visited[processing]) { // If vertex not checked yet find new strongly connected component and add to vector of vectors
+            vector<int> strongComponent = GetComponent(processing, reverseAdjList, visited, retIndexes);
             scc.push_back(strongComponent);
+        }
+    }
+
+    cout << " " << scc.size() << " SCCs stored in vector...";
+}
+
+void Graph::VisitVertex(int startVertex, vector<bool>& visited, vector<int>& retIndexes, stack<int>& toProcess) { // Note: Implemented via user-defined explicit call stack "recursion"
+    stack<int> callStack; // Explicitly defined call stack
+    callStack.push(startVertex);
+    visited[startVertex] = true; // Set up starting vertex
+
+    while (!callStack.empty()) {
+        int topCall = callStack.top();
+        bool canPop = true; // If no additional vertice found then pop topCall and push to processing stack for GetComponent DFS
+
+        for (; retIndexes[topCall] < adjList[topCall].size(); ++retIndexes[topCall]) {
+            if (!visited[adjList[topCall][retIndexes[topCall]]]) { // If not yet visited add to call stack, mark as visited, and set return index for top call
+                callStack.push(adjList[topCall][retIndexes[topCall]]);
+                visited[adjList[topCall][retIndexes[topCall]]] = true;
+                canPop = false;
+                break;
+            }
+        }
+
+        if (canPop) {
+            callStack.pop();
+            toProcess.push(topCall);
         }
     }
 }
 
-/* void Graph::GetComponent(int vertex, vector<vector<int>>& reverseAdjList, vector<bool>& visited, vector<int>& strongComponent) {
-    visited[vertex] = true;
-    strongComponent.push_back(vertex); // Add to strong component vector
+vector<int> Graph::GetComponent(int startVertex, vector<vector<int>>& reverseAdjList, vector<bool>& visited, vector<int>& retIndexes) { // Note: Implemented via user-defined explicit call stack "recursion"
+    vector<int> strongComponent;
+    stack<int> callStack; // Explicitly defined call stack
+    callStack.push(startVertex);
+    strongComponent.push_back(startVertex);
+    visited[startVertex] = true; // Set up starting vertex
 
-    for (int i = 0; i < reverseAdjList[vertex].size(); i++) { // Use reverse so that inward connections used
-        if (!visited[reverseAdjList[vertex][i]]) {
-            GetComponent(reverseAdjList[vertex][i], reverseAdjList, visited, strongComponent); // DFS visit for each vertex in strong component using recursion
+    while (!callStack.empty()) {
+        int topCall = callStack.top();
+        bool canPop = true; // If no additional vertice found then pop topCall
+        
+        for (retIndexes[topCall]; retIndexes[topCall] < reverseAdjList[topCall].size(); ++retIndexes[topCall]) {
+            if (!visited[reverseAdjList[topCall][retIndexes[topCall]]]) { // If not yet visited add to call stack, mark as visited, set return index for top call, and add to strong component
+                callStack.push(reverseAdjList[topCall][retIndexes[topCall]]);
+                visited[reverseAdjList[topCall][retIndexes[topCall]]] = true;
+                strongComponent.push_back(reverseAdjList[topCall][retIndexes[topCall]]);
+                canPop = false;
+                break;
+            }
+        }
+
+        if (canPop) {
+            callStack.pop();
         }
     }
-} */
 
-/* void Graph::VisitVertex(int vertex, vector<bool>& visited, stack<int>& toProcess) {
-    visited[vertex] = true;
-
-    for (int i = 0; i < adjList[vertex].size(); i++) {
-        if (!visited[adjList[vertex][i]]) {
-            VisitVertex(adjList[vertex][i], visited, toProcess); // DFS visit for each vertex to fill stack in timed order
-        }
-    }
-
-    toProcess.push(vertex); // Add to processing stack
-} */
+    return strongComponent;
+}
 
 vector<int> Graph::FollowingTree(int id) {
     vector<int> following;
@@ -229,7 +222,7 @@ vector<int> Graph::FollowingTree(int id) {
             }
         }
 
-        if (total - lastTotal == 0) {
+        if (total - lastTotal == 0) {  // If total does not change tree is done being built
             break;
         }
         
@@ -240,7 +233,7 @@ vector<int> Graph::FollowingTree(int id) {
             levels++;
         }
 
-        if (levels == 2) {
+        if (levels == 2) { // Cap tree levels at 2
             break;
         }
     }
@@ -254,13 +247,13 @@ vector<int> Graph::FollowerTree(int id) {
     follower.push_back(0);
 
     int total = 0;
-    int lastInLevel = id;
+    int lastInLevel = id; // Same variables as following tree
     int last = id;
     int lastTotal = 0;
     int levels = 0;
 
     queue<int> toCheck;
-    set<int> checked;
+    set<int> checked; // Same queue usage as following tree
     toCheck.push(id);
     checked.insert(id);
 
@@ -281,22 +274,22 @@ vector<int> Graph::FollowerTree(int id) {
             }
         }
 
-        if (total - lastTotal == 0) {
+        if (total - lastTotal == 0) { // If total does not change tree is done being built
             break;
         }
         
-        if (lastInLevel == checking) {
+        if (lastInLevel == checking) { // Push level count to vector and move to counting next vector
             lastInLevel = last;
             follower.push_back(total - lastTotal);
             lastTotal = total;
             levels++;
         }
 
-        if (levels == 2) {
+        if (levels == 2) { // Cap tree levels at 2
             break;
         }
     }
 
-    follower[0] = total;
+    follower[0] = total; // Update total count
     return follower;
 }

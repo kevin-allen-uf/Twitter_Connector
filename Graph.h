@@ -1,5 +1,6 @@
- #pragma once
-// Includes go here
+// Code developed by JDK Co. (John Ridgeway, Dennis Kim, Kevin Allen)
+
+#pragma once
 #include <vector>
 #include <stack>
 using namespace std;
@@ -21,10 +22,10 @@ class Graph {
         vector<vector<int>> scc; // Includes all vertices but grouped into strongly connected components
 
         // Private helper functions
-        void LoadData();
-        void SCC(); // Algorithm that does Strongly Connected Components, learned about concepts through GeeksforGeeks
-        // void GetComponent(int vertex, vector<vector<int>>& reverseAdjList, vector<bool>& visited, vector<int>& strongComponent); // Helper for SCC
-        // void VisitVertex(int vertext, vector<bool>& visited, stack<int>& toProcess); // Helper for SCC
-        vector<int> FollowingTree(int id);
-        vector<int> FollowerTree(int id);
+        void LoadData(); // Loads graph data into adjList private variable
+        void SCC(); // Kosaraju's Algorithm for Strongly Connected Components, learned about through GeeksforGeeks but implemented via user-defined explicit call stack "recursion"
+        void VisitVertex(int startVertex, vector<bool>& visited, vector<int>& retIndexes, stack<int>& toProcess); // Helper for SCC
+        vector<int> GetComponent(int startVertex, vector<vector<int>>& reverseAdjList, vector<bool>& visited, vector<int>& retIndexes); // Helper for SCC
+        vector<int> FollowingTree(int id); // Helper for GetConnections
+        vector<int> FollowerTree(int id); // Helper for GetConnections
 };
